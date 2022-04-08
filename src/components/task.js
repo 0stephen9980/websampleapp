@@ -10,15 +10,12 @@ export default class task extends Component {
             ref={provider.innerRef}
             {...provider.draggableProps}
             {...provider.dragHandleProps}
-            className="tasks"
           >
-            <div className="taskBody">
-              <a className="sideColor" />
-              <div>
-                <p>{this.props.task.id}</p>
-                <p>{this.props.task.content}</p>
-              </div>
+            <div className="tasks" style={{ borderLeft: this.props.bordColor }}>
+              <p>{this.props.task.id}</p>
+              <p>{this.props.task.content}</p>
             </div>
+            <div className="actionButtons"></div>
           </div>
         )}
       </Draggable>

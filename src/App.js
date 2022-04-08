@@ -9,7 +9,71 @@ class App extends Component {
   state = initialData;
 
   onDragEnd = (result) => {
-    console.log(result);
+    const { destination, source, combine, draggableId } = result;
+
+    console.log(combine);
+
+    if (!destination && !source && combine == null) {
+      if (
+        destination.droppableId === source.droppableId &&
+        destination.index === source.index
+      ) {
+        return;
+      }
+
+      const start = this.state.columns[source.droppableId];
+      const finish = this.state.columns[destination.droppableId];
+
+      if (start === finish) {
+        const newtaskIds = Array.from(start.taskIds);
+        newtaskIds.splice(source.index, 1);
+        newtaskIds.splice(destination.index, 0, draggableId);
+
+        const newColumn = {
+          ...start,
+          taskIds: newtaskIds,
+        };
+
+        const newState = {
+          ...this.state,
+          columns: {
+            ...this.state.columns,
+            [newColumn.id]: newColumn,
+          },
+        };
+
+        this.setState(newState);
+        return;
+      }
+
+      const newStartIds = Array.from(start.taskIds);
+      newStartIds.splice(source.index, 1);
+
+      const newStart = {
+        ...start,
+        taskIds: newStartIds,
+      };
+
+      const newFinishIds = Array.from(finish.taskIds);
+      newFinishIds.splice(destination.index, 0, draggableId);
+
+      const newFinish = {
+        ...finish,
+        taskIds: newFinishIds,
+      };
+
+      const newState = {
+        ...this.state,
+        columns: {
+          ...this.state.columns,
+          [newStart.id]: newStart,
+          [newFinish.id]: newFinish,
+        },
+      };
+
+      this.setState(newState);
+      return;
+    }
   };
 
   render() {
@@ -26,7 +90,14 @@ class App extends Component {
                   (taskId) => this.state.tasks[taskId]
                 );
 
-                return <Column key={index} column={column} tasks={tasks} />;
+                return (
+                  <Column
+                    key={index}
+                    column={column}
+                    tasks={tasks}
+                    initialData={this.state.tasks}
+                  />
+                );
               })}
             </div>
           </DragDropContext>
