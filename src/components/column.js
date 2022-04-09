@@ -23,11 +23,9 @@ export default class column extends Component {
     }
   }
 
-  addCard = (item, tasks, e) => {
+  addCard = (item, tasks) => {
     var itemId = item["data-rbd-droppable-id"];
     console.log(this.TotalTaskIds);
-
-    console.log(this.cardElement.current.style.display);
     this.cardElement.current.style.display = "none";
   };
   render() {
@@ -50,7 +48,7 @@ export default class column extends Component {
                 ref={this.cardElement}
                 className="createCard"
                 onClick={() =>
-                  this.addCard(provider.droppableProps, this.props.tasks, this)
+                  this.addCard(provider.droppableProps, this.props.tasks)
                 }
                 style={{ display: this.state.isAdd ? "flex" : "none" }}
               >

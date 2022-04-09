@@ -11,9 +11,50 @@ class App extends Component {
   onDragEnd = (result) => {
     const { destination, source, combine, draggableId } = result;
 
-    console.log(combine);
+    // console.log(combine, destination, source);
 
-    if (!destination && !source && combine == null) {
+    const start = this.state.columns[source.droppableId];
+
+    if (combine && source) {
+      //just removing the dragging item
+      const combineTaskIds = Array.from(start.taskIds);
+      //getting the task that is about to be merged
+      const taskToRemove = this.state.tasks[combineTaskIds[source.index]];
+      //removing the reference from the list
+      combineTaskIds.splice(source.index, 1);
+      //getting the task to be merged with
+      const taskToMerge = this.state.tasks[combine.draggableId];
+      var text = taskToMerge.content.concat(
+        "---------merge text---------",
+        taskToRemove.content
+      );
+
+      const newTask = {
+        ...taskToMerge,
+        content: text,
+      };
+
+      delete this.state.tasks[combine.draggableId];
+
+      this.setState((prevState) => ({
+        ...prevState,
+        tasks: {
+          ...prevState.tasks,
+          [newTask.id]: newTask,
+        },
+      }));
+      const newColumn = {
+        ...start,
+        taskIds: combineTaskIds,
+      };
+
+      this.setState((prevState) => ({
+        ...prevState,
+        columns: { ...prevState.columns, [newColumn.id]: newColumn },
+      }));
+      return;
+    }
+    if (destination && source && combine == null) {
       if (
         destination.droppableId === source.droppableId &&
         destination.index === source.index
@@ -21,7 +62,6 @@ class App extends Component {
         return;
       }
 
-      const start = this.state.columns[source.droppableId];
       const finish = this.state.columns[destination.droppableId];
 
       if (start === finish) {
