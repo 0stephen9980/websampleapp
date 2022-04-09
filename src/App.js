@@ -4,6 +4,9 @@ import React, { Component } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 import initialData from "./taskList";
 import Column from "./components/column";
+import Modal from "react-modal";
+
+Modal.setAppElement("#root");
 
 class App extends Component {
   state = initialData;

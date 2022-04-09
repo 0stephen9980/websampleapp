@@ -4,17 +4,18 @@ import { AiOutlinePlus } from "react-icons/ai";
 import "./column.css";
 import Task from "./task";
 import taskData from "../taskList";
+import Modal from "react-modal";
+import CommonModal from "./commonModal";
 
 export default class column extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isAdd: true,
       initialTaskData: props.initialData,
+      isModelOpen: false,
     };
-    this.cardElement = React.createRef();
-    this.NewCardElement = React.createRef();
     this.TotalTaskIds = [];
+    this.modalRef = React.createRef();
   }
 
   componentDidMount() {
@@ -23,47 +24,46 @@ export default class column extends Component {
     }
   }
 
-  addCard = (item, tasks) => {
-    var itemId = item["data-rbd-droppable-id"];
-    console.log(this.TotalTaskIds);
-    this.cardElement.current.style.display = "none";
+  addCard = () => {
+    // var itemId = item["data-rbd-droppable-id"];
+    // console.log(this.TotalTaskIds);
+    this.modalRef.current.testMethod(this.state.isModelOpen);
+    this.setState({
+      isModelOpen: true,
+    });
   };
+
   render() {
     return (
       <div className="container">
         <h3 className="title">{this.props.column.title}</h3>
+        <div
+          id={this.props.column.id}
+          className="createCard"
+          onClick={() => this.addCard()}
+        >
+          <AiOutlinePlus />
+          <p>Create</p>
+        </div>
+        <CommonModal ref={this.modalRef} />
         <Droppable
           droppableId={this.props.column.id}
           task={this.props.column.title}
           isCombineEnabled
         >
           {(provider, snapshot) => (
-            <div
-              ref={provider.innerRef}
-              {...provider.droppableProps}
-              className="droppableHeight"
-            >
-              <div
-                id={this.props.column.id}
-                ref={this.cardElement}
-                className="createCard"
-                onClick={() =>
-                  this.addCard(provider.droppableProps, this.props.tasks)
-                }
-                style={{ display: this.state.isAdd ? "flex" : "none" }}
-              >
-                <AiOutlinePlus />
-                <p>Create</p>
+            <div ref={provider.innerRef} {...provider.droppableProps}>
+              <div className="droppableHeight">
+                {this.props.tasks.map((task, index) => (
+                  <Task
+                    key={task.id}
+                    index={index}
+                    bordColor={this.props.column.borderColor}
+                    task={task}
+                  />
+                ))}
+                {provider.placeholder}
               </div>
-              {this.props.tasks.map((task, index) => (
-                <Task
-                  key={task.id}
-                  index={index}
-                  bordColor={this.props.column.borderColor}
-                  task={task}
-                />
-              ))}
-              {provider.placeholder}
             </div>
           )}
         </Droppable>
