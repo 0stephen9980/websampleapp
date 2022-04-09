@@ -9,7 +9,24 @@ import Modal from "react-modal";
 Modal.setAppElement("#root");
 
 class App extends Component {
-  state = initialData;
+  constructor(props) {
+    super(props);
+    this.state = {
+      tasks: initialData.tasks,
+      columns: initialData.columns,
+      columnSortOrder: initialData.columnSortOrder,
+      count: 0,
+      showTask: true,
+    };
+    this.TaskIds = [];
+  }
+
+  componentDidMount() {
+    for (var key in this.state.tasks) {
+      this.TaskIds.push(key);
+    }
+    this.state.count = this.TaskIds.length;
+  }
 
   onDragEnd = (result) => {
     const { destination, source, combine, draggableId } = result;
@@ -119,31 +136,82 @@ class App extends Component {
     }
   };
 
+  saveTask = (isNew, task, textValue, columId) => {
+    if (isNew) {
+      this.state.count++;
+      const newTask = {
+        id: `task-${this.state.count}`,
+        content: textValue,
+      };
+
+      const taskIds = this.state.columns[columId].taskIds.push(newTask.id);
+
+      this.setState((prevState) => ({
+        ...prevState,
+        tasks: {
+          ...prevState.tasks,
+          [newTask.id]: newTask,
+        },
+      }));
+      textValue = null;
+    } else {
+      var id = task.id;
+      const editTask = this.state.tasks[id];
+
+      const newTask = {
+        ...editTask,
+        content: textValue,
+      };
+
+      delete this.state.tasks[id];
+
+      this.setState((prevState) => ({
+        ...prevState,
+        tasks: {
+          ...prevState.tasks,
+          [newTask.id]: newTask,
+        },
+      }));
+
+      textValue = null;
+    }
+  };
+
   render() {
     return (
       <div className="App">
         <div>
           <h1>WelCome</h1>
+          <div
+            className="showTaskCol"
+            onClick={() => this.setState({ showTask: !this.state.showTask })}
+          >
+            <h3>Show Tasks</h3>
+          </div>
+          {this.state.showTask ? (
+            <div>
+              <DragDropContext onDragEnd={this.onDragEnd}>
+                <div className="dragArea">
+                  {this.state.columnSortOrder.map((columId, index) => {
+                    const column = this.state.columns[columId];
+                    const tasks = column.taskIds.map(
+                      (taskId) => this.state.tasks[taskId]
+                    );
 
-          <DragDropContext onDragEnd={this.onDragEnd}>
-            <div className="dragArea">
-              {this.state.columnSortOrder.map((columId, index) => {
-                const column = this.state.columns[columId];
-                const tasks = column.taskIds.map(
-                  (taskId) => this.state.tasks[taskId]
-                );
-
-                return (
-                  <Column
-                    key={index}
-                    column={column}
-                    tasks={tasks}
-                    initialData={this.state.tasks}
-                  />
-                );
-              })}
+                    return (
+                      <Column
+                        key={index}
+                        column={column}
+                        tasks={tasks}
+                        initialData={this.state.tasks}
+                        saveTask={this.saveTask}
+                      />
+                    );
+                  })}
+                </div>
+              </DragDropContext>
             </div>
-          </DragDropContext>
+          ) : null}
         </div>
       </div>
     );

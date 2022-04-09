@@ -4,8 +4,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 import "./column.css";
 import Task from "./task";
 import taskData from "../taskList";
-import Modal from "react-modal";
-import CommonModal from "./commonModal";
+import Modal from "./commonModal";
 
 export default class column extends Component {
   constructor(props) {
@@ -18,34 +17,38 @@ export default class column extends Component {
     this.modalRef = React.createRef();
   }
 
-  componentDidMount() {
-    for (var key in this.state.initialTaskData) {
-      this.TotalTaskIds.push(key);
-    }
-  }
-
   addCard = () => {
     // var itemId = item["data-rbd-droppable-id"];
     // console.log(this.TotalTaskIds);
-    this.modalRef.current.testMethod(this.state.isModelOpen);
+    this.modalRef.current.openModal(true, null, this.props.column.id);
     this.setState({
       isModelOpen: true,
     });
   };
 
+  handleMouseOver = (i) => {
+    // console.log(i);
+  };
+
   render() {
     return (
       <div className="container">
-        <h3 className="title">{this.props.column.title}</h3>
-        <div
-          id={this.props.column.id}
-          className="createCard"
-          onClick={() => this.addCard()}
-        >
-          <AiOutlinePlus />
-          <p>Create</p>
+        <div className="containerHeader">
+          <h3 className="title">{this.props.column.title}</h3>
+          <div
+            id={this.props.column.id}
+            className="createCard"
+            onClick={() => this.addCard()}
+          >
+            <AiOutlinePlus />
+            <p className="createBtn">Create</p>
+          </div>
         </div>
-        <CommonModal ref={this.modalRef} />
+        <Modal
+          ref={this.modalRef}
+          title={this.props.column.title}
+          saveTask={this.props.saveTask}
+        />
         <Droppable
           droppableId={this.props.column.id}
           task={this.props.column.title}
@@ -60,6 +63,9 @@ export default class column extends Component {
                     index={index}
                     bordColor={this.props.column.borderColor}
                     task={task}
+                    initialData={this.state.initialTaskData}
+                    onMouseEnter={() => this.handleMouseOver(index)}
+                    modelRef={this.modalRef}
                   />
                 ))}
                 {provider.placeholder}

@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { Draggable } from "react-beautiful-dnd";
+import { motion } from "framer-motion";
+import { FcEditImage } from "react-icons/fc";
 
 export default class task extends Component {
   render() {
@@ -9,13 +11,35 @@ export default class task extends Component {
           <div
             ref={provider.innerRef}
             {...provider.draggableProps}
-            {...provider.dragHandleProps}
+            onMouseEnter={this.props.onMouseEnter}
           >
-            <div className="tasks" style={{ borderLeft: this.props.bordColor }}>
-              <p>{this.props.task.id}</p>
-              <p>{this.props.task.content}</p>
+            <div
+              style={{ borderLeft: this.props.bordColor }}
+              {...provider.dragHandleProps}
+              className="tasks"
+            >
+              <div>
+                <p>{this.props.task.id}</p>
+                <p>{this.props.task.content}</p>
+              </div>
+              <div className="actionButtons">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <FcEditImage
+                    size={23}
+                    onClick={() =>
+                      this.props.modelRef.current.openModal(
+                        false,
+                        this.props.task,
+                        null
+                      )
+                    }
+                  />
+                </motion.div>
+              </div>
             </div>
-            <div className="actionButtons"></div>
           </div>
         )}
       </Draggable>
